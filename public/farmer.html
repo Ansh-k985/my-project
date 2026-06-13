@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Panel - Farmex: Linking Farmers to Consumers</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="farmer.html">
+        <i class="bi bi-flower1"></i> Farmex</span> <small class="fs-6 text-warning fw-normal">| Seller Panel</small>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center gap-2 mt-3 mt-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" href="farmer.html">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white-50 cursor-pointer" id="logout-btn" onclick="handleLogout()"><i
+                class="bi bi-box-arrow-right me-2"></i>Sign Out</a>
+          </li>
+
+          <!-- Profile Badge -->
+          <li class="nav-item ms-lg-2">
+            <div
+              class="d-flex align-items-center gap-2 bg-light bg-opacity-10 text-white px-3 py-1.5 rounded-pill border border-light border-opacity-25">
+              <i class="bi bi-person-circle text-warning"></i>
+              <span id="farmer-display-name">Farmer Name</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dashboard Overview Banner -->
+  <header class="bg-success text-white py-4 mb-4 border-bottom border-warning border-2">
+    <div class="container">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+        <div>
+          <h2 class="fw-bold mb-1"><i class="bi bi-speedometer2 me-2"></i>Farmer Sales Dashboard</h2>
+          <p class="mb-0 text-white-50">Manage your organic product listings, track live customer orders, and view total
+            earnings.</p>
+        </div>
+        <div class="mt-3 mt-md-0" id="farmer-local-badge">
+          <span class="badge bg-warning text-dark px-3 py-2 fs-6"><i class="bi bi-geo-alt-fill me-1"></i>City: -</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mb-5">
+
+    <!-- Earnings and Stats Modules -->
+    <section class="row g-4 mb-5">
+      <div class="col-md-4">
+        <div
+          class="card dashboard-stat-card border-success p-4 h-100 shadow-sm d-flex flex-column justify-content-center">
+          <small class="text-muted text-uppercase fw-bold"><i class="bi bi-currency-rupee me-1"></i>Total
+            Earnings</small>
+          <div class="earnings-highlight" id="stat-earnings">₹0.00</div>
+          <small class="text-muted mt-1">Calculated from all completed (Delivered) sales.</small>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div
+          class="card dashboard-stat-card border-primary p-4 h-100 shadow-sm d-flex flex-column justify-content-center">
+          <small class="text-muted text-uppercase fw-bold"><i class="bi bi-cart-check me-1"></i>Total Orders
+            Received</small>
+          <div class="fs-1 fw-bold text-primary mt-1" id="stat-total-orders">0</div>
+          <small class="text-muted mt-1">Total purchasing orders containing your products.</small>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div
+          class="card dashboard-stat-card border-warning p-4 h-100 shadow-sm d-flex flex-column justify-content-center">
+          <small class="text-muted text-uppercase fw-bold"><i class="bi bi-clock-history me-1"></i>Pending
+            Deliveries</small>
+          <div class="fs-1 fw-bold text-warning mt-1" id="stat-pending-orders">0</div>
+          <small class="text-muted mt-1">Orders awaiting packaging or shipment dispatch.</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Workspace Split: Listings Manager vs Live Orders -->
+    <section class="row g-4">
+
+      <!-- Product Manager Column -->
+      <div class="col-xl-5">
+        <div class="card mb-4 shadow-sm border-success border-opacity-25">
+          <div class="card-header bg-success text-white fw-bold py-3" id="form-header-title">
+            <i class="bi bi-plus-circle-fill me-2"></i>Add New Product Listing
+          </div>
+          <div class="card-body p-4">
+            <form id="product-form" onsubmit="handleProductSubmit(event)">
+              <!-- Hidden ID for edit mode -->
+              <input type="hidden" id="product-id">
+
+              <div class="mb-3">
+                <label for="prod-name" class="form-label fw-semibold">Product Name</label>
+                <input type="text" class="form-control" id="prod-name" required
+                  placeholder="e.g. Organic Alphanso Mangoes">
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="prod-category" class="form-label fw-semibold">Category</label>
+                  <select class="form-select" id="prod-category" required>
+                    <option value="" disabled selected>Select category</option>
+                    <option value="Fruits">Fruits</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Grains">Grains</option>
+                    <option value="Organic Fertilizers">Organic Fertilizers</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="prod-unit" class="form-label fw-semibold">Selling Unit</label>
+                  <input type="text" class="form-control" id="prod-unit" required placeholder="e.g. kg, bunch, quintal">
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="prod-price" class="form-label fw-semibold">Price (₹ per Unit)</label>
+                  <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input type="number" class="form-control" id="prod-price" required min="0" placeholder="e.g. 150">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="prod-stock" class="form-label fw-semibold">Stock Quantity</label>
+                  <input type="number" class="form-control" id="prod-stock" required min="0" placeholder="e.g. 50">
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="prod-img" class="form-label fw-semibold">Product Image URL (Optional)</label>
+                <input type="url" class="form-control" id="prod-img"
+                  placeholder="https://images.unsplash.com/... (or empty for default)">
+              </div>
+
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100 py-2.5" id="form-submit-btn">
+                  <i class="bi bi-check-circle me-1"></i>Publish Listing
+                </button>
+                <button type="button" class="btn btn-secondary py-2.5 d-none" id="form-cancel-btn"
+                  onclick="resetFormState()">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Current Products List -->
+        <div class="card shadow-sm border-light">
+          <div class="card-header bg-light fw-bold py-3 d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-tag-fill me-2"></i>My Listed Products</span>
+            <span class="badge bg-success" id="my-products-count">0 Listings</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="list-group list-group-flush" id="my-products-list">
+              <!-- Render farmer listings here -->
+              <div class="text-center py-5 text-muted">
+                No active listings. Use the form above to add products.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Order Tracker Column -->
+      <div class="col-xl-7">
+        <div class="card shadow-sm border-light">
+          <div class="card-header bg-dark text-white fw-bold py-3 d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-truck me-2"></i>Live Order Management Panel</span>
+            <button class="btn btn-sm btn-outline-light" onclick="fetchFarmerOrders()"><i
+                class="bi bi-arrow-clockwise"></i> Refresh</button>
+          </div>
+          <div class="card-body p-4">
+            <div id="orders-alert" class="alert alert-info d-none">No orders received from customers yet.</div>
+
+            <div class="accordion accordion-flush" id="ordersAccordion">
+              <!-- Orders containing farmer products will load here -->
+              <div class="text-center py-5 text-muted">
+                <i class="bi bi-inboxes fs-2 d-block mb-2"></i>
+                Searching for orders received...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-4">
+    <div class="container text-center">
+      <p class="mb-0">&copy; 2026 Farmex: Linking Farmers to Consumers. Empowering local communities through digital
+        technology.</p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JS Controller -->
+  <script src="farmer.js"></script>
+</body>
+
+</html>

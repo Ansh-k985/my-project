@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmex: Organic Direct-to-Consumer Marketplace</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="bi bi-flower1"></i> Farmex</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center gap-2 mt-3 mt-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" href="index.html">Marketplace</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link cursor-pointer" onclick="openOrdersModal()">My Orders</a>
+          </li>
+
+          <!-- Admin View Toggle (hidden by default) -->
+          <li class="nav-item d-none" id="nav-admin-link">
+            <a class="nav-link btn btn-outline-warning text-warning border-warning px-3 py-1"
+              onclick="toggleAdminPanel()">Admin Panel</a>
+          </li>
+
+          <!-- Cart Button -->
+          <li class="nav-item">
+            <button class="btn btn-accent px-3 position-relative" data-bs-toggle="offcanvas"
+              data-bs-target="#cartOffcanvas">
+              <i class="bi bi-cart3 me-1"></i> Cart
+              <span id="cart-badge"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
+            </button>
+          </li>
+
+          <!-- User Profile info / Logout -->
+          <li class="nav-item dropdown ms-lg-2">
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button"
+              data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle fs-5"></i>
+              <span id="user-display-name">Guest</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end mt-2">
+              <li>
+                <div class="dropdown-item-text">
+                  <strong id="user-role-badge">Role: Customer</strong><br>
+                  <small id="user-location-info" class="text-muted">City: -</small>
+                </div>
+              </li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item text-danger cursor-pointer" id="logout-btn" onclick="handleLogout()"><i
+                    class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero-section text-center text-lg-start mb-5" id="hero-banner">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-7">
+          <span class="hero-subtitle mb-2 d-inline-block">Organic & Pure</span>
+          <h1 class="hero-title fw-bold mb-3">Empowering Farmers Through Technology</h1>
+          <p class="lead mb-4 text-white-50">Farmex connects you directly to local organic producers. Eliminate
+            middlemen, support local agriculture, and buy fresh vegetables, fruits, and grains at transparent prices.
+          </p>
+          <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+            <a href="#products-showcase" class="btn btn-accent btn-lg px-4">Browse Marketplace</a>
+            <a onclick="toggleChatbot()" class="btn btn-outline-light btn-lg px-4"><i
+                class="bi bi-chat-dots me-2"></i>Ask Farmex AI</a>
+          </div>
+        </div>
+        <div class="col-lg-5 d-none d-lg-block text-center">
+          <i class="bi bi-tree text-white opacity-25" style="font-size: 15rem;"></i>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Marketplace Content -->
+  <main class="container mb-5" id="main-content">
+
+    <!-- Admin Dashboard (Hidden by default, displayed via JS for Admins) -->
+    <section id="admin-panel" class="mb-5 d-none animate-fade-in">
+      <div class="card border-warning">
+        <div class="card-header bg-warning text-dark fw-bold d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-shield-check me-2"></i>Admin Dashboard Control Panel</span>
+          <button class="btn btn-sm btn-dark" onclick="toggleAdminPanel()">Exit Admin View</button>
+        </div>
+        <div class="card-body">
+          <div class="row g-4 mb-4">
+            <div class="col-md-3">
+              <div class="card dashboard-stat-card border-primary p-3">
+                <small class="text-muted text-uppercase fw-bold">Farmers Registered</small>
+                <div class="fs-2 fw-bold text-primary" id="admin-stat-farmers">0</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card dashboard-stat-card border-info p-3">
+                <small class="text-muted text-uppercase fw-bold">Customers Registered</small>
+                <div class="fs-2 fw-bold text-info" id="admin-stat-customers">0</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card dashboard-stat-card border-success p-3">
+                <small class="text-muted text-uppercase fw-bold">Total Listings</small>
+                <div class="fs-2 fw-bold text-success" id="admin-stat-listings">0</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card dashboard-stat-card border-danger p-3">
+                <small class="text-muted text-uppercase fw-bold">Platform Orders</small>
+                <div class="fs-2 fw-bold text-danger" id="admin-stat-orders">0</div>
+              </div>
+            </div>
+          </div>
+
+          <h5 class="fw-bold mb-3">Listed Products (Global Administration)</h5>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Seller</th>
+                  <th>Location</th>
+                  <th>Price & Stock</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-products-table">
+                <!-- Admin listings rendered here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search and Location Filters -->
+    <section class="row g-3 mb-4" id="filters-showcase">
+      <!-- Search Input -->
+      <div class="col-lg-6 search-container">
+        <div class="input-group shadow-sm">
+          <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" id="search-input" class="form-control border-start-0"
+            placeholder="Search organic products (e.g. Tomatoes, Grains...)" oninput="filterProducts()">
+        </div>
+      </div>
+
+      <!-- City / Pincode Nearby Search Filter -->
+      <div class="col-lg-6 location-input-container">
+        <div class="input-group shadow-sm">
+          <span class="input-group-text bg-white border-end-0 text-success"><i class="bi bi-geo-fill"></i></span>
+          <input type="text" id="location-input" class="form-control border-start-0"
+            placeholder="Filter by City or Pincode (Nearby Search)" oninput="filterProducts()">
+          <button class="btn btn-outline-success" onclick="useMyLocalPincode()"><i class="bi bi-cursor-fill me-1"></i>My
+            Location</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Category Filter Bar -->
+    <section class="d-flex flex-wrap mb-4" id="categories-bar">
+      <button class="category-filter-btn active" onclick="setCategory('All', this)">All Categories</button>
+      <button class="category-filter-btn" onclick="setCategory('Fruits', this)">Fruits</button>
+      <button class="category-filter-btn" onclick="setCategory('Vegetables', this)">Vegetables</button>
+      <button class="category-filter-btn" onclick="setCategory('Grains', this)">Grains</button>
+      <button class="category-filter-btn" onclick="setCategory('Organic Fertilizers', this)">Organic
+        Fertilizers</button>
+    </section>
+
+    <!-- Products Showcase -->
+    <section class="mb-5" id="products-showcase">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold m-0 text-primary-green">Fresh Produce Available</h4>
+        <span id="product-count" class="text-muted fw-semibold">0 products found</span>
+      </div>
+
+      <div id="products-alert" class="alert alert-info d-none">No products found matching your filters.</div>
+
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" id="products-grid">
+        <!-- Products will load dynamically via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Shopping Cart Offcanvas -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title fw-bold" id="cartOffcanvasLabel"><i class="bi bi-cart-check me-2"></i>My Shopping Cart
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column">
+      <div id="cart-items-container" class="flex-grow-1 overflow-y-auto">
+        <!-- Cart items render dynamically -->
+        <div class="text-center py-5 text-muted">
+          <i class="bi bi-cart3 fs-1 d-block mb-3"></i>
+          Your shopping cart is empty.
+        </div>
+      </div>
+
+      <div class="border-top pt-3 mt-auto">
+        <div class="d-flex justify-content-between mb-3">
+          <strong class="fs-5">Subtotal:</strong>
+          <strong class="fs-5 text-success" id="cart-subtotal">₹0.00</strong>
+        </div>
+        <button class="btn btn-primary w-100 py-2.5" id="checkout-btn" disabled onclick="openCheckoutModal()">
+          Proceed to Checkout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div class="modal fade" id="checkoutModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title fw-bold"><i class="bi bi-wallet2 me-2"></i>Confirm Shipping & Order</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="placeOrder(event)">
+          <div class="modal-body">
+            <h6 class="fw-bold mb-3 border-bottom pb-2">Delivery Information</h6>
+
+            <div class="mb-3">
+              <label for="ship-phone" class="form-label">Contact Phone Number</label>
+              <input type="tel" class="form-control" id="ship-phone" required placeholder="9876543210">
+            </div>
+
+            <div class="mb-3">
+              <label for="ship-address" class="form-label">Complete Shipping Address</label>
+              <textarea class="form-control" id="ship-address" rows="3" required
+                placeholder="Flat No/House Name, Street Name, Area"></textarea>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="ship-city" class="form-label">City</label>
+                <input type="text" class="form-control" id="ship-city" required placeholder="e.g. Pune">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="ship-pincode" class="form-label">Pincode</label>
+                <input type="text" class="form-control" id="ship-pincode" required placeholder="e.g. 411001">
+              </div>
+            </div>
+
+            <div class="card bg-light p-3 mt-3">
+              <h6 class="fw-bold mb-2">Order Summary</h6>
+              <div id="checkout-summary-list" class="small mb-2">
+                <!-- Summary items here -->
+              </div>
+              <div class="d-flex justify-content-between border-top pt-2 fw-bold">
+                <span>Total Amount:</span>
+                <span class="text-success" id="checkout-total-price">₹0.00</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success"><i class="bi bi-shield-lock-fill me-1"></i>Place Order
+              (COD)</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders Tracking Modal -->
+  <div class="modal fade" id="ordersModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold"><i class="bi bi-box-seam me-2"></i>My Orders & Real-time Tracking</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="orders-list-container">
+            <!-- Customer orders will load here -->
+            <div class="text-center py-5 text-muted">
+              <i class="bi bi-clock-history fs-1 d-block mb-3"></i>
+              No orders placed yet.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating AI Chatbot Widget -->
+  <div class="chatbot-widget">
+    <!-- Chat window -->
+    <div class="chatbot-container" id="chatContainer">
+      <div class="chatbot-header">
+        <div class="chatbot-avatar">AI</div>
+        <div>
+          <h5 class="chatbot-title">Farmex Assistant</h5>
+          <span class="chatbot-status">Active Helper</span>
+        </div>
+      </div>
+
+      <!-- Messages window -->
+      <div class="chatbot-messages" id="chatMessages">
+        <div class="chat-bubble bot">
+          Hello! I am the Farmex AI Assistant. How can I help you today? Feel free to type a query or select an
+          interactive guide below:
+        </div>
+      </div>
+
+      <!-- Quick reply choices -->
+      <div class="chatbot-options" id="chatbotOptions">
+        <button class="chatbot-opt-btn" onclick="triggerBotOption('disease')"><i class="bi bi-bug me-1"></i>Crop
+          Diagnosis</button>
+        <button class="chatbot-opt-btn" onclick="triggerBotOption('pesticide')"><i
+            class="bi bi-droplet-half me-1"></i>Pesticide Recipes</button>
+        <button class="chatbot-opt-btn" onclick="triggerBotOption('seasonal')"><i
+            class="bi bi-calendar-event me-1"></i>Seasonal Crops</button>
+        <button class="chatbot-opt-btn" onclick="triggerBotOption('weather')"><i
+            class="bi bi-cloud-sun me-1"></i>Weather Advice</button>
+      </div>
+
+      <!-- User Text Input -->
+      <form class="chatbot-input-container" onsubmit="handleBotMessage(event)">
+        <input type="text" id="chatInput" class="chatbot-input" placeholder="Type a farming or order query...">
+        <button type="submit" class="chatbot-send-btn"><i class="bi bi-send-fill"></i></button>
+      </form>
+    </div>
+
+    <!-- Toggle button -->
+    <button class="chatbot-toggle" id="chatToggleBtn" onclick="toggleChatbot()">
+      <i class="bi bi-chat-dots-fill" id="chatToggleIcon"></i>
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-4">
+    <div class="container text-center">
+      <p class="mb-0">&copy; 2026 Farmex: Linking Farmers to Consumers. Empowering local communities through digital
+        technology.</p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JS Controller -->
+  <script src="index.js"></script>
+</body>
+
+</html>
